@@ -14,6 +14,18 @@ class Speech(object):
         self.debugger_enabled = debugger_enabled
         self.__debugger_microphone(enable=False)
 
+    def xunfei_speech_recognition(self, recognizer, audio):
+        speech = None
+        try:
+            speech = recognizer.recognize_google(audio)
+            print("Google Speech Recognition thinks you said " + speech)
+        except sr.UnknownValueError:
+            print("Google Speech Recognition could not understand audio")
+        except sr.RequestError as e:
+            print("Could not request results from Google Speech Recognition service; {0}".format(e))
+
+        return speech
+
     def google_speech_recognition(self, recognizer, audio):
         speech = None
         try:
