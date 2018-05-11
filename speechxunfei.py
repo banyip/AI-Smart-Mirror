@@ -1,15 +1,15 @@
-# speech.py
+# speechxunfei.py
 # speechrecognition, pyaudio, brew install portaudio
 import speech_recognition as sr
 import os
 import requests
 import stt
-from gtts import gTTS
+import tts
 from pydub import AudioSegment
 from pydub.playback import play
 
 
-class Speech(object):
+class Speechxunfei(object):
     def __init__(self, launch_phrase="mirror mirror", debugger_enabled=False):
         self.launch_phrase = launch_phrase
         self.debugger_enabled = debugger_enabled
@@ -27,24 +27,11 @@ class Speech(object):
 
         return speech
 
-
+ 
     def listen_for_micaudio(self):
         audio = input_from_mic()
         return audio
 
-    def listen_for_audio(self):
-        # obtain audio from the microphone
-        r = sr.Recognizer()
-        m = sr.Microphone()
-        with m as source:
-            r.adjust_for_ambient_noise(source)
-            self.__debugger_microphone(enable=True)
-            print "I'm listening"
-            audio = r.listen(source)
-
-        self.__debugger_microphone(enable=False)
-        print "Found audio"
-        return r, audio
 
     def is_call_to_action(self, recognizer, audio):
         speech = self.google_speech_recognition(recognizer, audio)
@@ -54,7 +41,7 @@ class Speech(object):
 
         return False
 
-    def is_call_to_xunfeiaction(self, audio):
+    def is_call_to_action(self, audio):
         speech = self.xunfei_speech_recognition( audio)
 
         if speech is not None and self.launch_phrase in speech.lower():
@@ -63,9 +50,8 @@ class Speech(object):
         return False
 
     def synthesize_text(self, text):
-        tts = gTTS(text=text, lang='en')
-        tts.save("tmp.mp3")
-        song = AudioSegment.from_mp3("tmp.mp3")
+        tts.text_to_speech(text,"tmp.wav")
+        song = AudioSegment.from_wav("tmp.mp3")
         play(song)
         os.remove("tmp.mp3")
 

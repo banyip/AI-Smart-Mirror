@@ -10,7 +10,7 @@ import dateutil.parser
 import json
 import traceback
 from nlg import NLG
-from speech import Speech
+from speechxunfei import Speechxunfei
 from knowledge import Knowledge
 from vision import Vision
 
@@ -26,7 +26,7 @@ camera = 0
 class Bot(object):
     def __init__(self):
         self.nlg = NLG(user_name=my_name)
-        self.speech = Speech(launch_phrase=launch_phrase, debugger_enabled=debugger_enabled)
+        self.speech = Speechxunfei(launch_phrase=launch_phrase, debugger_enabled=debugger_enabled)
         self.knowledge = Knowledge(weather_api_token)
         self.vision = Vision(camera=camera)
 
@@ -38,9 +38,9 @@ class Bot(object):
         while True:
             requests.get("http://localhost:8080/clear")
             if self.vision.recognize_face():
-                print "Found face"
+                print 'Found face'
                 if use_launch_phrase:
-                    recognizer, audio = self.speech.listen_for_audio()
+                    audio = self.speech.listen_for_micaudio()
                     if self.speech.is_call_to_action(recognizer, audio):
                         self.__acknowledge_action()
                         self.decide_action()
@@ -52,22 +52,22 @@ class Bot(object):
         Recursively decides an action based on the intent.
         :return:
         """
-        recognizer, audio = self.speech.listen_for_audio()
+        recognizer, audio = self.speech.listen_for_micaudio()
 
         # received audio data, now we'll recognize it using Google Speech Recognition
-        speech = self.speech.google_speech_recognition(recognizer, audio)
+        speech = self.speech.xunfei_speech_recognition( audio)
 
         if speech is not None:
             try:
-                r = requests.get('https://api.wit.ai/message?v=20160918&q=%s' % speech,
-                                 headers={"Authorization": wit_ai_token})
+                data = json.dumps({'q':'%s' %speech})
+                r = requests.post('http://fsitc1.chickenkiller.com:5000/parse?token=%s' % wit_ai_token , data = data)
                 print r.text
                 json_resp = json.loads(r.text)
                 entities = None
                 intent = None
-                if 'entities' in json_resp and 'Intent' in json_resp['entities']:
+                if 'entities' in json_resp and 'intent' in json_resp:
                     entities = json_resp['entities']
-                    intent = json_resp['entities']['Intent'][0]["value"]
+                    intent = json_resp['intent']["name"]
 
                 print intent
                 if intent == 'greeting':
