@@ -111,7 +111,7 @@ def speech_to_text(waveData):
 
 
     logging.info("开始语音听写 ...")
-    session_begin_params = "sub = iat, domain = iat, asr_denoise = 1, language = zh_cn, accent = mandarin, sample_rate = 16000, result_type = plain, result_encoding = utf8";
+    session_begin_params = "sub = iat, domain = iat, asr_denoise = 1, language = en_us, accent = mandarin, sample_rate = 16000, result_type = plain, result_encoding = utf8";
     sessionID = QISRSessionBegin(None,session_begin_params, byref(ret_c));
     if ret_c.value != 0 :
         logging.error("QISRSessionBegin failed, error code: " + ret_c.value);

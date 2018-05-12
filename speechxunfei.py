@@ -29,7 +29,7 @@ class Speechxunfei(object):
 
  
     def listen_for_micaudio(self):
-        audio = input_from_mic()
+        audio = stt.input_from_mic()
         return audio
 
 

@@ -3,7 +3,6 @@
 import speech_recognition as sr
 import os
 import requests
-import stt
 from gtts import gTTS
 from pydub import AudioSegment
 from pydub.playback import play
@@ -15,10 +14,10 @@ class Speech(object):
         self.debugger_enabled = debugger_enabled
         self.__debugger_microphone(enable=False)
 
-    def xunfei_speech_recognition(self, audio):
+    def google_speech_recognition(self, recognizer, audio):
         speech = None
         try:
-            speech = stt.speech_to_text(audio)
+            speech = recognizer.recognize_google(audio)
             print("Google Speech Recognition thinks you said " + speech)
         except sr.UnknownValueError:
             print("Google Speech Recognition could not understand audio")
@@ -26,11 +25,6 @@ class Speech(object):
             print("Could not request results from Google Speech Recognition service; {0}".format(e))
 
         return speech
-
-
-    def listen_for_micaudio(self):
-        audio = input_from_mic()
-        return audio
 
     def listen_for_audio(self):
         # obtain audio from the microphone
@@ -48,14 +42,6 @@ class Speech(object):
 
     def is_call_to_action(self, recognizer, audio):
         speech = self.google_speech_recognition(recognizer, audio)
-
-        if speech is not None and self.launch_phrase in speech.lower():
-            return True
-
-        return False
-
-    def is_call_to_xunfeiaction(self, audio):
-        speech = self.xunfei_speech_recognition( audio)
 
         if speech is not None and self.launch_phrase in speech.lower():
             return True
